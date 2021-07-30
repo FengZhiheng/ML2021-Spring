@@ -1,8 +1,3 @@
-tr_path = 'covid.train.csv'  # path to training data
-tt_path = 'covid.test.csv'   # path to testing data
-print('notebook is sucks')
-
-
 # PyTorch
 import torch
 import torch.nn as nn
@@ -17,20 +12,10 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 
-myseed = 42069  # set a random seed for reproducibility
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-np.random.seed(myseed)
-torch.manual_seed(myseed)
-if torch.cuda.is_available():
-    torch.cuda.manual_seed_all(myseed)
-
 
 def get_device():
     ''' Get device (if GPU is available, use GPU) '''
     return 'cuda' if torch.cuda.is_available() else 'cpu'
-
-print(get_device())
 
 def plot_learning_curve(loss_record, title=''):
     ''' Plot learning curve of your DNN (train & dev loss) '''
@@ -70,7 +55,6 @@ def plot_pred(dv_set, model, device, lim=35., preds=None, targets=None):
     plt.ylabel('predicted value')
     plt.title('Ground Truth v.s. Prediction')
     plt.show()
-
 
 class COVID19Dataset(Dataset):
     ''' Dataset for loading and preprocessing the COVID19 dataset '''
@@ -136,7 +120,6 @@ class COVID19Dataset(Dataset):
         # Returns the size of the dataset
         return len(self.data)
 
-
 def prep_dataloader(path, mode, batch_size, n_jobs=0, target_only=False):
     ''' Generates a dataset, then is put into a dataloader. '''
     dataset = COVID19Dataset(path, mode=mode, target_only=target_only)  # Construct dataset
@@ -146,7 +129,6 @@ def prep_dataloader(path, mode, batch_size, n_jobs=0, target_only=False):
         num_workers=n_jobs, pin_memory=True)                            # Construct dataloader
     return dataloader
 
-
 class NeuralNet(nn.Module):
     ''' A simple fully-connected deep neural network '''
     def __init__(self, input_dim):
@@ -155,9 +137,10 @@ class NeuralNet(nn.Module):
         # Define your neural network here
         # TODO: How to modify this model to achieve better performance?
         self.net = nn.Sequential(
-            nn.Linear(input_dim, 64),
-            nn.ReLU(),
-            nn.Linear(64, 1)
+            nn.Linear(input_dim, 256),
+            # nn.ReLU(),
+            nn.Sigmoid(),
+            nn.Linear(256, 1)
         )
 
         # Mean squared error loss
@@ -184,7 +167,6 @@ def dev(dv_set, model, device):
     total_loss = total_loss / len(dv_set.dataset)              # compute averaged loss
 
     return total_loss
-
 
 def train(tr_set, dv_set, model, config, device):
     ''' DNN training '''
@@ -226,12 +208,11 @@ def train(tr_set, dv_set, model, config, device):
         loss_record['dev'].append(dev_mse)
         if early_stop_cnt > config['early_stop']:
             # Stop training if your model stops improving for "config['early_stop']" epochs.
+            print("Stop training if your model stops improving for epochs.")
             break
 
     print('Finished training after {} epochs'.format(epoch))
     return min_mse, loss_record
-
-
 
 def test(tt_set, model, device):
     model.eval()                                # set model to evalutation mode
@@ -244,30 +225,6 @@ def test(tt_set, model, device):
     preds = torch.cat(preds, dim=0).numpy()     # concatenate all predictions and convert to a numpy array
     return preds
 
-
-
-
-device = get_device()                 # get the current available device ('cpu' or 'cuda')
-os.makedirs('models', exist_ok=True)  # The trained model will be saved to ./models/
-target_only = False                   # TODO: Using 40 states & 2 tested_positive features
-
-# TODO: How to tune these hyper-parameters to improve your model's performance?
-config = {
-    'n_epochs': 3000,                # maximum number of epochs
-    'batch_size': 270,               # mini-batch size for dataloader
-    'optimizer': 'SGD',              # optimization algorithm (optimizer in torch.optim)
-    'optim_hparas': {                # hyper-parameters for the optimizer (depends on which optimizer you are using)
-        'lr': 0.001,                 # learning rate of SGD
-        'momentum': 0.9              # momentum for SGD
-    },
-    'early_stop': 200,               # early stopping epochs (the number epochs since your model's last improvement)
-    'save_path': 'models/model.pth'  # your model will be saved here
-}
-
-
-
-
-
 def save_pred(preds, file):
     ''' Save predictions to specified file '''
     print('Saving results to {}'.format(file))
@@ -278,20 +235,45 @@ def save_pred(preds, file):
             writer.writerow([i, p])
 
 
-if "__name__" =="__mian__":
+if __name__ == "__main__":
+    # TODO: How to tune these hyper-parameters to improve your model's performance?
+    config = {
+        'n_epochs': 3000,                # maximum number of epochs
+        'batch_size': 270,               # mini-batch size for dataloader
+        'optimizer': 'SGD',              # optimization algorithm (optimizer in torch.optim)
+        'optim_hparas': {                # hyper-parameters for the optimizer (depends on which optimizer you are using)
+            'lr': 0.002,                 # learning rate of SGD
+            'momentum': 0.9              # momentum for SGD
+        },
+        'early_stop': 500,               # early stopping epochs (the number epochs since your model's last improvement)
+        'save_path': 'models/model.pth'  # your model will be saved here
+    }
+
+    tr_path = 'covid.train.csv'  # path to training data
+    tt_path = 'covid.test.csv'   # path to testing data
+
+    device = get_device()                 # get the current available device ('cpu' or 'cuda')
+    os.makedirs('models', exist_ok=True)  # The trained model will be saved to ./models/
+    target_only = True                   # TODO: Using 40 states & 2 tested_positive features
+
+    myseed = 42069  # set a random seed for reproducibility
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(myseed)
+    torch.manual_seed(myseed)
+
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(myseed)
+
     print("this is main function")
     tr_set = prep_dataloader(tr_path, 'train', config['batch_size'], target_only=target_only)
     dv_set = prep_dataloader(tr_path, 'dev', config['batch_size'], target_only=target_only)
     tt_set = prep_dataloader(tt_path, 'test', config['batch_size'], target_only=target_only)
     print("data load finished!")
 
-
     model = NeuralNet(tr_set.dataset.dim).to(device)  # Construct model and move to device
-
     model_loss, model_loss_record = train(tr_set, dv_set, model, config, device)
-
     plot_learning_curve(model_loss_record, title='deep model')
-
 
     del model
     model = NeuralNet(tr_set.dataset.dim).to(device)
@@ -299,9 +281,5 @@ if "__name__" =="__mian__":
     model.load_state_dict(ckpt)
     plot_pred(dv_set, model, device)  # Show prediction on the validation set
 
-
-
-preds = test(tt_set, model, device)  # predict COVID-19 cases with your model
+    preds = test(tt_set, model, device)  # predict COVID-19 cases with your model
     save_pred(preds, 'pred.csv')         # save prediction file to pred.csv
-
-pass
