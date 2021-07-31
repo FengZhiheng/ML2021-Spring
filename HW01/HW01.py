@@ -142,9 +142,10 @@ class NeuralNet(nn.Module):
             nn.Sigmoid(),
             nn.Linear(256, 1)
         )
-
         # Mean squared error loss
         self.criterion = nn.MSELoss(reduction='mean')
+        self.myloss = torch.tensor([0.0], requires_grad = True)
+
 
     def forward(self, x):
         ''' Given input of size (batch_size x input_dim), compute output of the network '''
@@ -153,7 +154,42 @@ class NeuralNet(nn.Module):
     def cal_loss(self, pred, target):
         ''' Calculate loss '''
         # TODO: you may implement L1/L2 regularization here
-        return self.criterion(pred, target)
+        # L1 mean absolute error (MAE)
+
+        # error = 0
+        # if pred.shape[0] == target.shape[0]:
+        #     for i in range(pred.shape[0]):
+        #         x = pred[i].item()
+        #         y = target[i].item()
+        #         e = abs(x-y)
+        #         error += e
+        # meanError = error*1.0/pred.shape[0]
+        # return torch.tensor(meanError, requires_grad = True)
+
+
+        # import math
+        # # L2 function  mean squaril error(MAE)
+        # error = 0
+        # if pred.shape[0] == target.shape[0]:
+        #     for i in range(pred.shape[0]):
+        #         x = pred[i].item()
+        #         y = target[i].item()
+        #         e = math.pow((x-y),2)
+        #         error += e
+        #
+        #     meanError = error*1.0/pred.shape[0]
+        #     # print(meanError)
+        #     return torch.tensor(meanError, requires_grad = True)
+
+        #要用tensor的方式计算出 mse
+        # torch.mean((pred - target)**2)
+
+        return torch.mean(abs(pred - target))
+
+        # 要用tensor的方式计算出 mse
+        # return torch.mean((pred - target)**2)
+
+        # return self.criterion(pred, target)
 
 def dev(dv_set, model, device):
     model.eval()                                # set model to evalutation mode
