@@ -138,14 +138,39 @@ class NeuralNet(nn.Module):
         # TODO: How to modify this model to achieve better performance?
         self.net = nn.Sequential(
             nn.Linear(input_dim, 256),
-            # nn.ReLU(),
-            nn.Sigmoid(),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
+            nn.ReLU(),
+            # nn.Sigmoid(),
             nn.Linear(256, 1)
         )
         # Mean squared error loss
         self.criterion = nn.MSELoss(reduction='mean')
         self.myloss = torch.tensor([0.0], requires_grad = True)
-
 
     def forward(self, x):
         ''' Given input of size (batch_size x input_dim), compute output of the network '''
@@ -165,7 +190,6 @@ class NeuralNet(nn.Module):
         #         error += e
         # meanError = error*1.0/pred.shape[0]
         # return torch.tensor(meanError, requires_grad = True)
-
 
         # import math
         # # L2 function  mean squaril error(MAE)
@@ -205,7 +229,7 @@ def dev(dv_set, model, device):
     return total_loss
 
 def train(tr_set, dv_set, model, config, device):
-    ''' DNN training '''
+    r''' DNN training '''
 
     n_epochs = config['n_epochs']  # Maximum number of epochs
 
@@ -275,7 +299,7 @@ if __name__ == "__main__":
     # TODO: How to tune these hyper-parameters to improve your model's performance?
     config = {
         'n_epochs': 3000,                # maximum number of epochs
-        'batch_size': 270,               # mini-batch size for dataloader
+        'batch_size': 200,               # mini-batch size for dataloader
         'optimizer': 'SGD',              # optimization algorithm (optimizer in torch.optim)
         'optim_hparas': {                # hyper-parameters for the optimizer (depends on which optimizer you are using)
             'lr': 0.002,                 # learning rate of SGD
