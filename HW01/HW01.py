@@ -288,7 +288,7 @@ if __name__ == "__main__":
 
     device = get_device()                 # get the current available device ('cpu' or 'cuda')
     os.makedirs('models', exist_ok=True)  # The trained model will be saved to ./models/
-    target_only = True                   # TODO: Using 40 states & 2 tested_positive features
+    target_only = False                   # TODO: Using 40 states & 2 tested_positive features
 
     myseed = 42069  # set a random seed for reproducibility
     torch.backends.cudnn.deterministic = True
