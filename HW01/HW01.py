@@ -137,36 +137,10 @@ class NeuralNet(nn.Module):
         # Define your neural network here
         # TODO: How to modify this model to achieve better performance?
         self.net = nn.Sequential(
-            nn.Linear(input_dim, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
+            nn.Linear(input_dim, 64),
             nn.ReLU(),
             # nn.Sigmoid(),
-            nn.Linear(256, 1)
+            nn.Linear(64, 1)
         )
         # Mean squared error loss
         self.criterion = nn.MSELoss(reduction='mean')
@@ -298,12 +272,12 @@ def save_pred(preds, file):
 if __name__ == "__main__":
     # TODO: How to tune these hyper-parameters to improve your model's performance?
     config = {
-        'n_epochs': 3000,                # maximum number of epochs
+        'n_epochs': 5000,                # maximum number of epochs
         'batch_size': 200,               # mini-batch size for dataloader
-        'optimizer': 'SGD',              # optimization algorithm (optimizer in torch.optim)
+        'optimizer': 'Adadelta',              # optimization algorithm (optimizer in torch.optim)
         'optim_hparas': {                # hyper-parameters for the optimizer (depends on which optimizer you are using)
-            'lr': 0.002,                 # learning rate of SGD
-            'momentum': 0.9              # momentum for SGD
+            'lr': 0.2,                 # learning rate of SGD
+            # 'momentum': 0.8              # momentum for SGD
         },
         'early_stop': 500,               # early stopping epochs (the number epochs since your model's last improvement)
         'save_path': 'models/model.pth'  # your model will be saved here
