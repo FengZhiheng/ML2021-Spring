@@ -2,3 +2,5 @@
 .idea
 *.pth
 *.csv
+*.zip
+*.npy
