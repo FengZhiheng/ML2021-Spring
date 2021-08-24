@@ -12,7 +12,6 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 
-
 def get_device():
     ''' Get device (if GPU is available, use GPU) '''
     return 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -267,7 +266,6 @@ def save_pred(preds, file):
         writer.writerow(['id', 'tested_positive'])
         for i, p in enumerate(preds):
             writer.writerow([i, p])
-
 
 if __name__ == "__main__":
     # TODO: How to tune these hyper-parameters to improve your model's performance?

@@ -33,3 +33,8 @@ The lecture videos are available on Hung-Yi Lee's [youtube channel](https://www.
 * HW13 : Network Compression
 * HW14 : Life-Long Learning
 * HW15 : Meta Learning
+
+
+
+### 这些code可以在kaggle上进行测试吗？
+
