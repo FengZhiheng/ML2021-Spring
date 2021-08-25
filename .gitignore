@@ -15,3 +15,5 @@ HW03/food-11
 *.ckpt
 *.csv
 *.pth
+*.pt
+HW04/Dataset/
